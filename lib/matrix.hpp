@@ -60,10 +60,10 @@ auto matrix_diagonal(const std::size_t &d){
     Eigen::MatrixXf D(d, d);
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 1); // Distribución para 0 y 1
+    std::uniform_int_distribution<> dis(0, 1);
 
     for (int i = 0; i < d; ++i) {
-        D(i, i) = dis(gen) * 2 - 1; // Convertir 0 a -1 y 1 a 1
+        D(i, i) = dis(gen) * 2 - 1;
     }
     return D;
 }
