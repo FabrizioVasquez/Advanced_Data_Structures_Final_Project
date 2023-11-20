@@ -1,4 +1,4 @@
-# PROYECTO FINAL DE Estructuras de Datos Avanzados - dLSHBF
+# Proyecto final de Estructuras de Datos Avanzados - dLSHBF
 
 <div align="center">
 
