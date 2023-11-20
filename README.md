@@ -1,5 +1,7 @@
 # Proyecto final de Estructuras de Datos Avanzados - dLSHBF
 
+División de datos 80-20 para MNIST como SPEECH. De los datos de MNIST solo se extrajo la parte de entrenamiento y se subidivió de acuerdo al paper es decir 60_000 imágenes de 10 categorías considerando las etiquetas diferente de 1 como normales y con valor 1 anormales. Para el conjunto de datos SPEECH se dividio a partir de los datos considerando la totalidad del conjunto, es decir 3686 segmentos de habla en inglés con diferentes acentos, aqui solo hay 2 categorías 1 y 0 (anómalo y normal) por lo que no fue necesario considerar el paso que se adiciono para el MNIST.
+
 <div align="center">
 
 | Dataset         | DR       | FAR      |
