@@ -4,7 +4,7 @@
 #include "libraries.hpp"
 #include <fstream>
 
-MatrixXd read_csv(const std::string& _path){
+MatrixXf read_csv(const std::string& _path){
     const std::string& filename{_path};
     std::ifstream file(filename.c_str());
     if(!file.is_open()){
@@ -25,7 +25,7 @@ MatrixXd read_csv(const std::string& _path){
         data.push_back(fila);
     }
     size_t rows = data.size(), columns = data.front().size();
-    MatrixXd matrix(rows, columns);
+    MatrixXf matrix(rows, columns);
     for(int i = 0; i<rows; i++){
         for(int j = 0; j<columns; j++){
             matrix(i, j) = data[i][j];
