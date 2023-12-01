@@ -33,12 +33,36 @@ auto matrix_sparse(const std::size_t &n_rows, const std::size_t &n_columns, floa
 
 }
 
+
+template <typename XDT=float>
+auto matrix_walsh_hadamard_matrix(const std::size_t &d){
+    if(d == 1){ // caso base matrix d = 2
+        Eigen::MatrixXf cbase{{1,1},{1,-1}};
+        return cbase;
+    }else{
+        Eigen::MatrixXf smaller_matrix = matrix_walsh_hadamard_matrix<XDT>(d / 2);
+        Eigen::MatrixXf top = Eigen::MatrixXf::Zero(d, d);
+        Eigen::MatrixXf bottom = Eigen::MatrixXf::Zero(d, d);
+
+        top.leftCols(d / 2) = smaller_matrix;
+        top.rightCols(d / 2) = smaller_matrix;
+
+        bottom.leftCols(d / 2) = smaller_matrix;
+        bottom.rightCols(d / 2) = -smaller_matrix;
+
+        Eigen::MatrixXf result(2 * d, 2 * d);
+        result.topRows(d) = top;
+        result.bottomRows(d) = bottom;
+        return result;
+    }
+}
+
 int dot_product_mod2(int x, int y) {
     int product = 0;
     while (x && y) {
-        product ^= (x % 2) & (y % 2);
-        x >>= 1;
-        y >>= 1;
+        product ^= (x % 2) & (y % 2); // XOR de los bits menos significativos
+        x >>= 1; // Desplazar x a la derecha
+        y >>= 1; // Desplazar y a la derecha
     }
     return product;
 }
@@ -58,14 +82,27 @@ auto matrix_normalized_walsh_hadamard(const std::size_t &d) {
 
 auto matrix_diagonal(const std::size_t &d){
     Eigen::MatrixXf D(d, d);
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 1);
-
     for (int i = 0; i < d; ++i) {
         D(i, i) = dis(gen) * 2 - 1;
     }
     return D;
+}
+
+
+
+
+
+
+template<typename XDT=float>
+void print_sparse_matrix(const Eigen::SparseMatrix<XDT>& matrix) {
+    for (int k = 0; k < matrix.outerSize(); ++k)
+        for (Eigen::SparseMatrix<float>::InnerIterator it(matrix, k); it; ++it) {
+            std::cout << "Element(" << it.row() << "," << it.col() << ") = \t\t " << it.value() << std::endl;
+        }
 }
 
 #endif //PROYECTO_FINAL_MATRIX_HPP
