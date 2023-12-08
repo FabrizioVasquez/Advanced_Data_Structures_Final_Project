@@ -33,6 +33,7 @@ public:
             std::string item_str = ss.str() + std::to_string(i);
 
             std::size_t index = std::hash<std::string>()(item_str) % bit_array.size();
+            std::cout<<"bit_array[index] "<< index << "  "<< bit_array[index] << " \n";
             if (!bit_array[index]) {
                 return false;
             }

@@ -1,5 +1,10 @@
+#ifndef MNIST_Dataset_cpp
+#define MNIST_Dataset_cpp
+
 #include "../include/MNIST_Dataset.hpp"
 #include <fstream>
+#include <Eigen/Dense>
+
 
 uint32_t swap_endian(std::uint32_t val){
     val = ( (val << 8 ) & 0xFF00FF00) | ((val >>  8) & 0xFF00FF);
@@ -80,25 +85,25 @@ void MNIST_Dataset::read_mnist_db(const int max_items) {
     label_file.close();
 }
 
-std::size_t MNIST_Dataset::get_images_length() {
-    return _images.size();
-}
+//std::size_t MNIST_Dataset::get_images_length() {
+//    return _images.size();
+//}
 
 int MNIST_Dataset::get_label_from_index(int index) {
     return _images.at(index)._label;
 }
 
-void MNIST_Dataset::save_dataset_as_png(std::string save_dir) {
-    for(MNIST_Image &img: _images){
-        img.save_as_png(save_dir);
-    }
-}
-
-void MNIST_Dataset::save_dataset_as_csv(std::string save_dir) {
-    for(MNIST_Image img: _images){
-        img.save_as_csv(save_dir);
-    }
-}
+//void MNIST_Dataset::save_dataset_as_png(std::string save_dir) {
+//    for(MNIST_Image &img: _images){
+//        img.save_as_png(save_dir);
+//    }
+//}
+//
+//void MNIST_Dataset::save_dataset_as_csv(std::string save_dir) {
+//    for(MNIST_Image img: _images){
+//        img.save_as_csv(save_dir);
+//    }
+//}
 
 Eigen::MatrixXf MNIST_Dataset::to_matrix()
 {
@@ -117,12 +122,15 @@ Eigen::MatrixXf MNIST_Dataset::to_matrix()
     return mat;
 };
 
-Eigen::MatrixXf MNIST_Dataset::get_X(Eigen::MatrixXf &mat)
-{
-    return mat.rightCols(mat.cols() - 1);
-}
+//Eigen::MatrixXf MNIST_Dataset::get_X(Eigen::MatrixXf &mat)
+//{
+//    return mat.rightCols(mat.cols() - 1);
+//}
+//
+//Eigen::VectorXf MNIST_Dataset::get_Y(Eigen::MatrixXf &mat)
+//{
+//    return mat.leftCols(1);
+//}
 
-Eigen::VectorXf MNIST_Dataset::get_Y(Eigen::MatrixXf &mat)
-{
-    return mat.leftCols(1);
-}
+
+#endif /* MNIST_Dataset_cpp */

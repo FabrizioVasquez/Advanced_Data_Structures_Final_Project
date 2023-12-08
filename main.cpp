@@ -1,6 +1,5 @@
 #include <iostream>
 #include <Eigen/Dense>
-#include <algorithm>
 #include "util/read.hpp"
 #include "util/selection.hpp"
 #include "lib/matrix.hpp"
@@ -8,6 +7,7 @@
 #include "lib/bloomfilter.hpp"
 #include "SimpleIni.h"
 #include "include/MNIST_Dataset.hpp"
+#include <nlohmann/json.hpp>
 
 #define TRAIN_IMAGE_MAGIC 2051
 #define TRAIN_LABEL_MAGIC 2049
@@ -15,13 +15,14 @@
 #define TEST_LABEL_MAGIC 2049
 
 
-void dLSHBF_MNIST(const Eigen::MatrixXf& X_train, const Eigen::VectorXf& y_train,
-                  const Eigen::MatrixXf& X_test, const Eigen::VectorXf& y_test) {
+std::vector<int> paper_algorithm(const Eigen::MatrixXf& X_train,
+                                 const Eigen::MatrixXf& X_test)
+{
 
     long n = X_train.rows(); // número de datos de entrenamiento
     long d = X_train.cols(); // dimensión original
     long k = 50;             // cantidad de hash codes
-    long m = 1000;           // tamaño del filtro de Bloom
+    long m = 100;           // tamaño del filtro de Bloom
     long b = 50;             // dimensión reducida
 
     Eigen::SparseMatrix<float> P1 = matrix_sparse<float>(b, d, 0.1);
@@ -65,6 +66,15 @@ void dLSHBF_MNIST(const Eigen::MatrixXf& X_train, const Eigen::VectorXf& y_train
         }
     }
 
+    return y_pred;
+}
+
+
+void dLSHBF_MNIST(const Eigen::MatrixXf& X_train, const Eigen::VectorXf& y_train,
+                  const Eigen::MatrixXf& X_test, const Eigen::VectorXf& y_test) {
+
+    std::vector<int> y_pred = paper_algorithm(X_train, X_test);
+
     std::cout << "Resultado de la MNIST DATASET: ";
     int count2 = 0;
     //std::cout << "REAL    vs PREDECIDO" << std::endl;
@@ -105,8 +115,6 @@ void dLSHBF_MNIST(const Eigen::MatrixXf& X_train, const Eigen::VectorXf& y_train
     std::pair<double, double> result = calcular_DR_FAR(y_test_std, y_pred);
     std::cout << "DR: " << result.first << ", FAR: " << result.second << std::endl;
 }
-
-
 
 auto dLSHBF_SPEECH() {
     MatrixXf data = read_csv("../data/speech_data.csv");
@@ -187,12 +195,13 @@ auto dLSHBF_SPEECH() {
     std::cout << "DR: " << result.first << ", FAR: " << result.second << std::endl;
 }
 
-int main() {
-
+int main(int argc, char **argv) {
     CSimpleIni ini;
     ini.SetUnicode();
 
-    SI_Error rc = ini.LoadFile("config.ini");
+    std::string basepath = "/home/miunmn/Documents/utec/eda/proyecto_final_EDA";
+
+    SI_Error rc = ini.LoadFile("/home/miunmn/Documents/utec/eda/proyecto_final_EDA/config.ini");
     if(rc < 0){
         std::cout << "Error loading file" << std::endl;
         return EXIT_FAILURE;
@@ -232,58 +241,6 @@ int main() {
               << PRINT_VAR(save_img)        <<" "
               << PRINT_VAR(alpha)           <<" "
               << PRINT_VAR(hidden_layer_size) << std::endl;
-    /*
-    MNIST_Dataset train_dataset(img_path_train.c_str(),label_path_train.c_str(),TRAIN_IMAGE_MAGIC,TRAIN_LABEL_MAGIC);
-    train_dataset.read_mnist_db(max_items);
-
-    //std::cout<< PRINT_VAR(train_dataset.get_images_length()) << std::endl;
-    //std::cout<< PRINT_VAR(train_dataset.get_label_from_index(4)) << std::endl;
-
-    if(save_img){
-        train_dataset.save_dataset_as_png(save_dir_train);
-    }
-    train_dataset.save_dataset_as_csv(save_dir_train+"/train.csv");
-
-    Eigen::MatrixXf train_mat = train_dataset.to_matrix();
-    Eigen::VectorXi y_train      = train_mat.cast<int>().leftCols(1);
-    Eigen::MatrixXf X_train      = train_mat.rightCols(train_mat.cols()-1);
-
-    std::cout<<X_train.rows()<<" "<<X_train.cols()<<std::endl;
-    std::cout<<y_train<<std::endl;
-
-    int categories = y_train.maxCoeff()+1;
-
-    X_train = X_train / 255.0;
-    Eigen::MatrixXf X_train_T = X_train.transpose();
-
-
-    std::cout<<std::endl;
-    std::cout<<"PATH TRAIN"<<std::endl;
-    std::cout<<img_path_train<<std::endl;
-    std::cout<<label_path_train<<std::endl;
-
-    // TEST
-
-    std::cout<<std::endl;
-    std::cout<<base_dir<<std::endl;
-    std::cout<<"PATH TEST"<<std::endl;
-    std::cout<<img_path_train<<std::endl;
-    std::cout<<label_path_train<<std::endl;
-
-    MNIST_Dataset test_dataset(img_path_test.c_str(), label_path_test.c_str(), TEST_IMAGE_MAGIC, TEST_LABEL_MAGIC);
-    test_dataset.read_mnist_db(max_items);
-    std::cout<<save_dir_test<<std::endl;
-
-    if (save_img)
-        test_dataset.save_dataset_as_png(save_dir_test);
-
-    test_dataset.save_dataset_as_csv(save_dir_test + "/test.csv");
-
-    Eigen::MatrixXf test_mat = test_dataset.to_matrix();
-    Eigen::VectorXf y_test = test_mat.leftCols(1);
-    Eigen::MatrixXf X_test = test_mat.rightCols(test_mat.cols()-1);
-    X_test = X_test / 255.0;
-    */
 
     MNIST_Dataset train_dataset(img_path_train.c_str(),label_path_train.c_str(),TRAIN_IMAGE_MAGIC,TRAIN_LABEL_MAGIC);
     //std::cout<<img_path;
@@ -364,11 +321,48 @@ int main() {
         }
     }
 
-    std::cout << "Total normal data: " << normal_indices.size() << std::endl;
-    std::cout << "Total anormal data: " << abnormal_indices.size() << std::endl;
+//    std::cout << "Total normal data: " << normal_indices.size() << std::endl;
+//    std::cout << "Total anormal data: " << abnormal_indices.size() << std::endl;
+//    std::cout<< "\n X_test: " << X_test;
 
-    dLSHBF_MNIST(X_train,y_train,X_test,y_test);
-    dLSHBF_SPEECH();
+//    X_test leer de csv
+    std::ifstream file("/home/miunmn/Documents/utec/eda/api-final/points.json");
+    nlohmann::json j;
+    file >> j;
+
+    // Acceder a los datos analizados
+    std::vector<double> points = j["points"].get<std::vector<double>>();
+
+    // Imprimir los puntos
+    Eigen::MatrixXf user_input(1,784);
+    user_input.setZero();
+    std::cout << "Puntos: ";
+    for (int i = 0; i < points.size(); i++) {
+        user_input(0, i) = points[i];
+        std::cout << points[i] << " ";
+    }
+
+
+
+      auto result = paper_algorithm(X_train, user_input);
+      std::string store_string = std::to_string(result[0]);
+    std::cout<<"storing: "<<store_string<<'\n';
+    const char* fileName = "/home/miunmn/Documents/utec/eda/api-final/result.txt";
+
+    std::ofstream outputFile(fileName);
+    if (outputFile.is_open()) {
+        // Write the string to the file
+        outputFile << store_string << std::endl;
+
+        // Close the file
+        outputFile.close();
+
+        std::cout << "String has been successfully stored in " << fileName << std::endl;
+    } else {
+        std::cerr << "Error opening the file: " << fileName << std::endl;
+    }
+//    dLSHBF_MNIST(X_train, y_train, X_test, y_test);
+//    dLSHBF_SPEECH();
 
     return EXIT_SUCCESS;
 }

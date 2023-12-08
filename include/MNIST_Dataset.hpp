@@ -1,5 +1,9 @@
+#ifndef MNIST_Dataset_hpp
+#define MNIST_Dataset_hpp
+
 #include "MNIST_Image.hpp"
 #include <vector>
+#include <Eigen/Dense>
 
 class MNIST_Dataset{
 private:
@@ -15,12 +19,16 @@ public:
                   int label_magic);
 
     void read_mnist_db(const int max_items);
-    std::size_t get_images_length();
+//    std::size_t get_images_length();
     int get_label_from_index(int index);
 
-    void save_dataset_as_png(std::string save_dir);
-    void save_dataset_as_csv(std::string save_dir);
+//    void save_dataset_as_png(std::string save_dir);
+//    void save_dataset_as_csv(std::string save_dir);
     Eigen::MatrixXf to_matrix();
-    static Eigen::MatrixXf get_X(Eigen::MatrixXf &mat);
-    static Eigen::VectorXf get_Y(Eigen::MatrixXf &mat);
+//    static Eigen::MatrixXf get_X(Eigen::MatrixXf &mat);
+//    static Eigen::VectorXf get_Y(Eigen::MatrixXf &mat);
 };
+
+
+
+#endif /* MNIST_Dataset_hpp */

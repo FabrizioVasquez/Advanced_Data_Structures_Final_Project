@@ -1,5 +1,8 @@
+#ifndef MNIST_Image_hpp
+#define MNIST_Image_hpp
+
 #pragma once
-#include"../util/libraries.hpp"
+#include <cstdint>
 
 class MNIST_Image{
 public:
@@ -12,6 +15,9 @@ public:
     MNIST_Image(const MNIST_Image &other);
     ~MNIST_Image();
 
-    void save_as_png(std::string save_dir);
-    void save_as_csv(std::string save_filename);
+//    void save_as_png(std::string save_dir);
+//    void save_as_csv(std::string save_filename);
 };
+
+
+#endif /* MNIST_Image_hpp */
